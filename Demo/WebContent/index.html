@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+		
+
+		<script src="resources/sap-ui-core.js"
+				id="sap-ui-bootstrap"
+				data-sap-ui-libs="sap.ui.commons, sap.ui.ux3, sap.ui.table"
+				data-sap-ui-theme="sap_bluecrystal">
+		</script>
+		<!-- add sap.ui.table,sap.ui.ux3 and/or other libraries to 'data-sap-ui-libs' if required -->
+
+		<script>
+				sap.ui.localResources("demo");
+
+				jQuery.sap.require("sap.ui.core.routing.Router");
+				jQuery.sap.require("sap.ui.core.routing.HashChanger");
+				
+				var oShell  = sap.ui.ux3.Shell("shellId", {
+					appTitle: "Demo",
+					showLogoutButton: false,
+					showSearchTool: false,
+					worksetItems: [
+						new sap.ui.ux3.NavigationItem("page1Id",{
+							key:"Page1",
+							text:"Page1"
+						}),
+						new sap.ui.ux3.NavigationItem("page2Id",{
+							key:"Page2",
+							text:"Page2"
+						}),
+					],
+					worksetItemSelected: function(e){
+						this.removeAllContent();
+						var selected_Key = e.getParameter("key");
+						
+						//In Case of Router
+						var oHashChanger = new sap.ui.core.routing.HashChanger();
+						oHashChanger.setHash(router.getURL(selected_Key));
+						
+						/*
+						In Case of not using Router
+						var selectedView = sap.ui.getCore().byId(selected_Key);
+						if(selectedView == undefined){
+							console.log("New View Rendering");
+							selectedView =  new sap.ui.view({
+								id: selected_Key,
+								viewName: "demo."+selected_Key,
+								type:sap.ui.core.mvc.ViewType.JS
+							})
+						}else{
+							console.log("Old view");
+						}
+						
+						this.addContent(selectedView);
+						*/
+					},
+					/* Repeating Logic
+					content: [new sap.ui.view({
+						id: "View1Id",
+						viewName: "demo.Page1",
+						type: sap.ui.core.mvc.ViewType.JS
+					})]
+					*/
+
+				});
+				oShell.placeAt("content");
+				//create Router
+				var router = new sap.ui.core.routing.Router([
+					{//Rule # 1
+						pattern:"",
+						name:"Page1",
+						view:"demo.Page1",
+						viewType:sap.ui.core.mvc.ViewType.JS,
+						targetControl: "shellId",
+						targetAggregation: "content",	//content/page
+						clearTarget: true,
+						callback: function(){
+							oShell.setSelectedWorksetItem("page1Id");
+						}
+					},
+					{//Rule # 2
+						pattern:["Page2","Page2"],
+						name:"Page2",
+						view:"demo.Page2",
+						viewType:sap.ui.core.mvc.ViewType.JS,
+						targetControl: "shellId",
+						targetAggregation: "content",	//content/page
+						clearTarget: true,
+						callback: function(){
+							oShell.setSelectedWorksetItem("page2Id");
+						}
+					}
+				]);
+				
+				//Register Router to enable to be used by any other controller
+				router.register("appRouter");
+				router.initialize();
+		</script>
+
+	</head>
+	<body class="sapUiBody" role="application">
+		<div id="content"></div>
+	</body>
+</html>
